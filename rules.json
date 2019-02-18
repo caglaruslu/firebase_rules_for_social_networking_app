@@ -1,0 +1,109 @@
+{
+  "rules": {
+
+    //CLUBS
+
+    "clubs": {
+      "$clubid": {
+
+                  //STATE
+
+        "state": {
+          ".read": true,
+          "$preferences":{
+            ".write": "$preferences !== 'is_active' && $preferences !== 'is_verified'"
+          }
+        },
+
+                  //TITLE
+
+        "title": {
+         ".read": true,
+         ".write": "root.child('clubs').child($clubid).child('users').child('members').child(auth.uid).child('state').child('is_admin').val() === 'true'"
+        },
+
+                //ADMINS
+
+        "admins": {
+          ".read": true,
+          ".write": "root.child('clubs').child($clubid).child('users').child('members').child(auth.uid).child('state').child('is_admin').val() === 'true'"
+        },
+
+
+                  //USERS
+
+        "users": {
+          ".read": "root.child('clubs').child($clubid).child('users').child('members').child(auth.uid).child('state').child('is_verified').val() === 'true'",
+          ".write": true,
+          "members":{
+            "$uid":{
+              ".read": "root.child('clubs').child($clubid).child('users').child('members').child(auth.uid).child('state').child('is_verified').val() === 'true' || auth.uid === $uid",
+              "state":{
+                "$preferences":{
+                  ".validate": "($preferences !== 'is_moderator' && $preferences !== 'is_admin' && $preferences !== 'is_verified' && auth.uid === $uid) || root.child('clubs').child($clubid).child('users').child('members').child(auth.uid).child('state').child('is_admin').val() === 'true' || root.child('clubs').child($clubid).child('users').child('members').child(auth.uid).child('state').child('is_moderator').val() === 'true'"
+                }
+              }
+            }
+
+          }
+        },
+
+                  //ACTIVITIES
+
+        "activities":{
+          ".read": "root.child('clubs').child($clubid).child('users').child('members').child(auth.uid).child('state').child('is_verified').val() === 'true'",
+          ".write": "root.child('clubs').child($clubid).child('users').child('members').child(auth.uid).child('state').child('is_verified').val() === 'true'",
+            "$activityId": {
+              "$preferences": {
+                ".validate": "$preferences === 'participants' || root.child('clubs').child($clubid).child('users').child('members').child(auth.uid).child('state').child('is_admin').val() === 'true' || root.child('clubs').child($clubid).child('users').child('members').child(auth.uid).child('state').child('is_moderator').val() === 'true'"
+              }
+            }
+
+        },
+
+                  //ANNOUNCEMENTS
+
+        "announcements": {
+          ".read": "root.child('clubs').child($clubid).child('users').child('members').child(auth.uid).child('state').child('is_verified').val() === 'true'",
+          ".write": "root.child('clubs').child($clubid).child('users').child('members').child(auth.uid).child('state').child('is_admin').val() === 'true' || root.child('clubs').child($clubid).child('users').child('members').child(auth.uid).child('state').child('is_moderator').val() === 'true'"
+        },
+
+                  //COMMENTS
+
+        "comments": {
+          ".read": "root.child('clubs').child($clubid).child('users').child('members').child(auth.uid).child('state').child('is_verified').val() === 'true'",
+          ".write": "root.child('clubs').child($clubid).child('users').child('members').child(auth.uid).child('state').child('is_verified').val() === 'true'"
+        },
+
+                  //MESSAGES
+
+        "messages": {
+          ".write": true,
+          "$mesageId":{
+            ".read": "(data.child('from_id').val() == auth.uid) || (data.child('to_id').val() == auth.uid)",
+            ".validate": "(newData.child('from_id').val() == auth.uid) || (newData.child('to_id').val() == auth.uid)"
+          }
+        },
+
+                  //POSTS
+
+        "posts": {
+          ".read": "root.child('clubs').child($clubid).child('users').child('members').child(auth.uid).child('state').child('is_verified').val() === 'true'",
+          ".write": "root.child('clubs').child($clubid).child('users').child('members').child(auth.uid).child('state').child('is_verified').val() === 'true'"
+        },
+
+                  //USER-MESSAGES
+
+        "user_messages": {
+          "$fromId":{
+            ".read": "auth.uid == $fromId",
+            ".write": true,
+            "$toId":{
+              ".validate": "(auth.uid == $fromId) || (auth.uid == $toId)"
+            }
+          }
+        }
+      }
+    }
+  }
+}
